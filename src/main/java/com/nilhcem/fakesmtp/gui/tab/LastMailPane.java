@@ -129,8 +129,4 @@ public final class LastMailPane implements Observer {
 			}
 		}
 	}
-
-	public void initTestPane() {
-		lastMailArea.setText("hello world test this is a test for a message test");
-	}
 }

@@ -242,10 +242,6 @@ public final class MainPanel {
 				// switch to last message
 				tabbedPane.setSelectedIndex(2);
 				
-				//TODO: remove this {
-				lastMailPane.initTestPane();
-				//}
-
 				// lookup text
 				lastMailPane.searchForText(searchText.getText());
 			}
