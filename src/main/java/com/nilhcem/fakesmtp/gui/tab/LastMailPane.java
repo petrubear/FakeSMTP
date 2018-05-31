@@ -6,12 +6,17 @@ import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rsyntaxtextarea.Token;
+import org.fife.ui.rtextarea.RTextScrollPane;
+import org.fife.ui.rtextarea.SearchContext;
+import org.fife.ui.rtextarea.SearchEngine;
+import org.fife.ui.rtextarea.SearchResult;
 
 import com.nilhcem.fakesmtp.gui.info.ClearAllButton;
 import com.nilhcem.fakesmtp.model.EmailModel;
@@ -25,7 +30,7 @@ import com.nilhcem.fakesmtp.server.MailSaver;
  */
 public final class LastMailPane implements Observer {
 
-	private final JScrollPane lastMailPane = new JScrollPane();
+	private final RTextScrollPane lastMailPane = new RTextScrollPane();
 	private final RSyntaxTextArea lastMailArea = new RSyntaxTextArea();
 
 	// private final JTextArea lastMailArea = new JTextArea();
@@ -56,6 +61,10 @@ public final class LastMailPane implements Observer {
 			final Font boldFont = new Font(defaultFont, Font.BOLD, 14);
 			lastMailArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_HTML);
 			lastMailArea.setCodeFoldingEnabled(true);
+			lastMailArea.setMarkOccurrences(true);
+			lastMailArea.setAntiAliasingEnabled(true);
+			lastMailArea.setAutoscrolls(true);
+
 			SyntaxScheme scheme = lastMailArea.getSyntaxScheme();
 			scheme.getStyle(Token.RESERVED_WORD).font = boldFont;
 			lastMailArea.revalidate();
@@ -99,5 +108,29 @@ public final class LastMailPane implements Observer {
 		} else if (o instanceof ClearAllButton) {
 			lastMailArea.setText("");
 		}
+	}
+
+	/**
+	 * performs text search
+	 */
+	public void searchForText(String text) {
+		if (text != null && text.length() > 0) {
+			SearchContext context = new SearchContext();
+			context.setSearchFor(text);
+			context.setSearchForward(true);
+			context.setWholeWord(false);
+			context.setMatchCase(false);
+			context.setRegularExpression(false);
+
+			SearchResult sr = SearchEngine.find(lastMailArea, context);
+			if (!sr.wasFound()) {
+				lastMailArea.setCaretPosition(0);
+				SearchEngine.find(lastMailArea, context);
+			}
+		}
+	}
+
+	public void initTestPane() {
+		lastMailArea.setText("hello world test this is a test for a message test");
 	}
 }
