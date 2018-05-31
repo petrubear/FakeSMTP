@@ -150,6 +150,7 @@ public final class MailsListPane implements Observer {
 		model.addColumn(i18n.get("mailslist.col.to"));
 		model.addColumn(i18n.get("mailslist.col.subject"));
 		table.setModel(model);
+		table.setShowGrid(true);
 
 		mailsListPane.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {

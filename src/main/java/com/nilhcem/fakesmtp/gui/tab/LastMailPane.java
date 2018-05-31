@@ -1,13 +1,21 @@
 package com.nilhcem.fakesmtp.gui.tab;
 
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JScrollPane;
+
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
+import org.fife.ui.rsyntaxtextarea.Token;
+
 import com.nilhcem.fakesmtp.gui.info.ClearAllButton;
 import com.nilhcem.fakesmtp.model.EmailModel;
 import com.nilhcem.fakesmtp.server.MailSaver;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * Scrolled text area where will be displayed the last received email.
@@ -18,13 +26,41 @@ import java.util.Observer;
 public final class LastMailPane implements Observer {
 
 	private final JScrollPane lastMailPane = new JScrollPane();
-	private final JTextArea lastMailArea = new JTextArea();
+	private final RSyntaxTextArea lastMailArea = new RSyntaxTextArea();
+
+	// private final JTextArea lastMailArea = new JTextArea();
+
+	/**
+	 * Gets prefered font if found
+	 */
+	public String getDefaultFontName() {
+		final String defaultFont = "PragmataPro";
+		String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+		if (Arrays.asList(fonts).contains(defaultFont)) {
+			return defaultFont;
+		}
+
+		return "Monospace";
+	}
 
 	/**
 	 * Creates the text area and disables the possibility to edit it.
 	 */
 	public LastMailPane() {
+		final String defaultFont = getDefaultFontName();
+		final Font plainFont = new Font(defaultFont, Font.PLAIN, 14);
+		lastMailArea.setFont(plainFont);
 		lastMailArea.setEditable(false);
+
+		if (lastMailArea instanceof RSyntaxTextArea) {
+			final Font boldFont = new Font(defaultFont, Font.BOLD, 14);
+			lastMailArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_HTML);
+			lastMailArea.setCodeFoldingEnabled(true);
+			SyntaxScheme scheme = lastMailArea.getSyntaxScheme();
+			scheme.getStyle(Token.RESERVED_WORD).font = boldFont;
+			lastMailArea.revalidate();
+		}
+
 		lastMailPane.getViewport().add(lastMailArea, null);
 	}
 
@@ -41,14 +77,19 @@ public final class LastMailPane implements Observer {
 	 * Updates the content of the text area.
 	 * <p>
 	 * This method will be called by an observable element.
-     * </p>
+	 * </p>
 	 * <ul>
-	 *   <li>If the observable is a {@link MailSaver} object, the text area will contain the content of the last received email;</li>
-	 *   <li>If the observable is a {@link ClearAllButton} object, the text area will be cleared.</li>
+	 * <li>If the observable is a {@link MailSaver} object, the text area will
+	 * contain the content of the last received email;</li>
+	 * <li>If the observable is a {@link ClearAllButton} object, the text area will
+	 * be cleared.</li>
 	 * </ul>
 	 *
-	 * @param o the observable element which will notify this class.
-	 * @param data optional parameters (an {@code EmailModel} object, for the case of a {@code MailSaver} observable).
+	 * @param o
+	 *            the observable element which will notify this class.
+	 * @param data
+	 *            optional parameters (an {@code EmailModel} object, for the case of
+	 *            a {@code MailSaver} observable).
 	 */
 	@Override
 	public synchronized void update(Observable o, Object data) {
