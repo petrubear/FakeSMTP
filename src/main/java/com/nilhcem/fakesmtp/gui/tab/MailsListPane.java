@@ -1,20 +1,6 @@
 package com.nilhcem.fakesmtp.gui.tab;
 
-import com.nilhcem.fakesmtp.core.ArgsHandler;
-import com.nilhcem.fakesmtp.core.Configuration;
-import com.nilhcem.fakesmtp.core.I18n;
-import com.nilhcem.fakesmtp.gui.info.ClearAllButton;
-import com.nilhcem.fakesmtp.model.EmailModel;
-import com.nilhcem.fakesmtp.model.UIModel;
-import com.nilhcem.fakesmtp.server.MailSaver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.mail.internet.MimeUtility;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
@@ -28,8 +14,26 @@ import java.text.SimpleDateFormat;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.mail.internet.MimeUtility;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.nilhcem.fakesmtp.core.ArgsHandler;
+import com.nilhcem.fakesmtp.core.Configuration;
+import com.nilhcem.fakesmtp.core.I18n;
+import com.nilhcem.fakesmtp.gui.info.ClearAllButton;
+import com.nilhcem.fakesmtp.model.EmailModel;
+import com.nilhcem.fakesmtp.model.UIModel;
+import com.nilhcem.fakesmtp.server.MailSaver;
+
 /**
- * Scrolled table where will be displayed every received email (one line for each email).
+ * Scrolled table where will be displayed every received email (one line for
+ * each email).
  * <p>
  * The user can double-click on any row to see the selected email.
  * </p>
@@ -44,8 +48,8 @@ public final class MailsListPane implements Observer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MailsListPane.class);
 	private final I18n i18n = I18n.INSTANCE;
 	private final JScrollPane mailsListPane = new JScrollPane();
-	private final SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss a");
-	private final int[] widths = new int[] {85, 140, 140}; // widths of columns in tab
+	private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+	private final int[] widths = new int[] { 85, 140, 140 }; // widths of columns in tab
 
 	/**
 	 * Table with non-editable cells.
@@ -76,8 +80,8 @@ public final class MailsListPane implements Observer {
 	 * Adds some mouse events on the table, to display emails, when a user clicks on
 	 * a specific row.<br>
 	 * If the email can't be found, an error message will be displayed.<br>
-	 * The table will reset the size of its column every time the size of the table changed
-	 * (for example when the user maximizes the window).
+	 * The table will reset the size of its column every time the size of the table
+	 * changed (for example when the user maximizes the window).
 	 * </p>
 	 */
 	public MailsListPane() {
@@ -136,7 +140,7 @@ public final class MailsListPane implements Observer {
 					}
 				}
 			});
-        }
+		}
 
 		// Auto scroll tab to bottom when a new element is inserted
 		table.addComponentListener(new ComponentAdapter() {
@@ -151,10 +155,12 @@ public final class MailsListPane implements Observer {
 		model.addColumn(i18n.get("mailslist.col.subject"));
 		table.setModel(model);
 		table.setShowGrid(true);
+		table.setGridColor(Color.GRAY);
 
 		mailsListPane.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
-				// When the width of a column is changed, only the columns to the left and right of the margin change
+				// When the width of a column is changed, only the columns to the left and right
+				// of the margin change
 				table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 
 				// Set width for each column
@@ -183,17 +189,20 @@ public final class MailsListPane implements Observer {
 	 * Updates the content of the table.
 	 * <p>
 	 * This method will be called by an observable element.
-     * </p>
+	 * </p>
 	 * <ul>
-	 *   <li>If the observable is a {@link MailSaver} object, a new row will be added
-	 *   to the table, and the {@link UIModel} will be updated;</li>
-	 *   <li>If the observable is a {@link ClearAllButton} object, all the cells
-	 *   of the table will be removed, and the {@link UIModel} will be updated.</li>
+	 * <li>If the observable is a {@link MailSaver} object, a new row will be added
+	 * to the table, and the {@link UIModel} will be updated;</li>
+	 * <li>If the observable is a {@link ClearAllButton} object, all the cells of
+	 * the table will be removed, and the {@link UIModel} will be updated.</li>
 	 * </ul>
 	 *
-	 * @param o the observable element which will notify this class.
-	 * @param arg optional parameters (an {@code EmailModel} object, for the case of
-	 * a {@code MailSaver} observable) containing all the information about the email.
+	 * @param o
+	 *            the observable element which will notify this class.
+	 * @param arg
+	 *            optional parameters (an {@code EmailModel} object, for the case of
+	 *            a {@code MailSaver} observable) containing all the information
+	 *            about the email.
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
@@ -207,7 +216,8 @@ public final class MailsListPane implements Observer {
 				subject = email.getSubject();
 			}
 
-			model.addRow(new Object[] {dateFormat.format(email.getReceivedDate()), email.getFrom(), email.getTo(), subject});
+			model.addRow(new Object[] { dateFormat.format(email.getReceivedDate()), email.getFrom(), email.getTo(),
+					subject });
 			UIModel.INSTANCE.getListMailsMap().put(nbElements++, email.getFilePath());
 		} else if (o instanceof ClearAllButton) {
 			// Delete information from the map
@@ -227,11 +237,12 @@ public final class MailsListPane implements Observer {
 	/**
 	 * Displays a message dialog containing the error specified in parameter.
 	 *
-	 * @param error a String representing an error message to display.
+	 * @param error
+	 *            a String representing an error message to display.
 	 */
 	private void displayError(String error) {
 		JOptionPane.showMessageDialog(mailsListPane.getParent(), error,
-			String.format(i18n.get("mailslist.err.title"), Configuration.INSTANCE.get("application.name")),
-			JOptionPane.ERROR_MESSAGE);
+				String.format(i18n.get("mailslist.err.title"), Configuration.INSTANCE.get("application.name")),
+				JOptionPane.ERROR_MESSAGE);
 	}
 }
